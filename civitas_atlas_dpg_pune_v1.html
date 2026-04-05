@@ -1,0 +1,836 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+:root{
+--bg:#0F0A1F;--bg2:#1A1333;--bg3:#231845;
+--p:#6D28D9;--p2:#9333EA;--acc:#C084FC;
+--gold:#E8B84B;--gold2:#f5c85e;
+--text:#FFFFFF;--text2:rgba(255,255,255,0.6);--text3:rgba(255,255,255,0.3);
+--border:rgba(109,40,217,0.3);--border2:rgba(109,40,217,0.15);
+--success:#22A05A;--danger:#D94040;--warning:#E6A817;
+--r:12px;
+--font:'Outfit',sans-serif;
+}
+.light-mode{
+--bg:#F5F3FF;--bg2:#FFFFFF;--bg3:#EDE9FE;
+--text:#1F2937;--text2:#6B7280;--text3:#9CA3AF;
+--border:rgba(109,40,217,0.2);--border2:rgba(109,40,217,0.1);
+--bg-card:#FFFFFF;
+}
+
+html,body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ANIMATIONS */
+@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 10px rgba(109,40,217,0.3)}50%{box-shadow:0 0 24px rgba(109,40,217,0.7)}}
+
+.animate-in{animation:slideIn 0.6s cubic-bezier(0.4,0,0.2,1) both;}
+.fade-up{animation:fadeUp 0.5s ease both;}
+
+/* DRAWER OVERLAY */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.drawer-overlay.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--bg2);z-index:101;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.drawer.open{transform:translateX(0);}
+.drawer-head{padding:20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(109,40,217,0.2),rgba(147,51,234,0.1));}
+.drawer-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.drawer-logo .dlogo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;}
+.drawer-logo .dtitle{font-weight:700;font-size:15px;color:var(--text);}
+.drawer-sub{font-size:10px;color:var(--text2);letter-spacing:0.5px;}
+.drawer-nav{flex:1;overflow-y:auto;padding:12px 0;}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:12px 20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
+.drawer-item:hover,.drawer-item.active{color:var(--acc);background:rgba(109,40,217,0.1);border-left-color:var(--p);}
+.drawer-item .di-icon{font-size:16px;width:20px;text-align:center;}
+.drawer-foot{padding:16px 20px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);}
+
+/* MAIN HEADER */
+.main-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:50;animation:glow 4s ease infinite;}
+.header-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;}
+.hamburger{width:36px;height:36px;border:1px solid var(--border);border-radius:8px;background:rgba(109,40,217,0.1);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--acc);border-radius:1px;transition:all 0.3s;}
+.header-center{flex:1;}
+.header-title{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.3px;transition:all 0.3s;}
+.header-sub{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
+.header-actions{display:flex;gap:8px;align-items:center;}
+.h-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(109,40,217,0.1);color:var(--acc);font-size:11px;cursor:pointer;font-family:var(--font);font-weight:500;transition:all 0.2s;white-space:nowrap;}
+.h-btn:hover{background:var(--p);color:#fff;border-color:var(--p);}
+.h-btn.active-lang{background:var(--p);color:#fff;}
+
+/* SCROLL TABS */
+.tab-scroll{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px;border-bottom:1px solid var(--border2);background:var(--bg);}
+.tab-scroll::-webkit-scrollbar{display:none;}
+.tab-item{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+.tab-item:hover{color:var(--acc);}
+.tab-item.active{color:var(--acc);border-bottom-color:var(--p);}
+
+/* CONTENT */
+.content{padding:16px;}
+.section{display:none;animation:slideIn 0.5s ease both;}
+.section.active{display:block;}
+
+/* METRIC CARDS */
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(109,40,217,0.2),transparent 70%);border-radius:0 12px 0 60px;}
+.m-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.m-value{font-size:20px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;}
+.m-sub{font-size:10px;color:var(--success);margin-top:3px;}
+.m-badge{position:absolute;top:10px;right:10px;background:rgba(109,40,217,0.2);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:10px;color:var(--acc);}
+
+/* CHARTS */
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
+.chart-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.chart-card h3::before{content:'';width:3px;height:13px;background:linear-gradient(var(--p),var(--p2));border-radius:2px;display:inline-block;}
+
+/* FSI BARS */
+.city-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.city-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border2);}
+.city-hd h3{font-size:14px;font-weight:600;color:var(--text);}
+.city-auth{font-size:9px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px;}
+.city-max{background:rgba(109,40,217,0.2);color:var(--acc);font-size:10px;padding:3px 8px;border-radius:10px;font-family:'DM Mono',monospace;border:1px solid var(--border);}
+.fsi-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border2);}
+.fsi-row:last-child{border:none;}
+.fsi-name{font-size:11px;color:var(--text2);flex:1.5;min-width:0;}
+.fsi-bar-bg{flex:2;height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+.fsi-bar{height:100%;border-radius:4px;transition:width 1s ease;}
+.fsi-num{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text);min-width:28px;text-align:right;}
+.fsi-tag{font-size:9px;padding:2px 6px;border-radius:8px;white-space:nowrap;}
+.t-res{background:rgba(34,160,90,0.15);color:#22c55e;}
+.t-com{background:rgba(59,130,246,0.15);color:#60a5fa;}
+.t-tod{background:rgba(234,179,8,0.15);color:#facc15;}
+.t-sra{background:rgba(217,64,64,0.15);color:#f87171;}
+.t-it{background:rgba(192,132,252,0.15);color:#c084fc;}
+.t-ind{background:rgba(156,163,175,0.15);color:#9ca3af;}
+
+/* RURAL BANNER */
+.rural-banner{background:linear-gradient(135deg,#0d2a1a,#1a4a30);border:1px solid rgba(34,160,90,0.3);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.rural-banner h3{font-size:14px;font-weight:600;color:#4ade80;margin-bottom:10px;}
+.rural-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rural-item{background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;}
+.ri-l{font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.3px;}
+.ri-v{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:#4ade80;}
+.ri-n{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;}
+
+/* SEARCH */
+.search-block{background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(147,51,234,0.08));border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
+.search-block h3{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:12px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;}
+.form-group select,.form-group input{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:12px;font-family:var(--font);outline:none;appearance:none;-webkit-appearance:none;}
+.form-group select option{background:var(--bg2);color:var(--text);}
+.search-btn-row{display:flex;gap:8px;margin-top:8px;}
+.srch-btn{flex:1;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);}
+.srch-btn2{background:transparent;color:var(--acc);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;font-family:var(--font);}
+
+/* RECORD CARDS */
+.record-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.rec-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.rec-title{font-size:13px;font-weight:600;color:var(--text);}
+.rec-id{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px;}
+.status-pill{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.s-clear{background:rgba(34,160,90,0.15);color:#4ade80;border:1px solid rgba(34,160,90,0.3);}
+.s-enc{background:rgba(217,64,64,0.15);color:#f87171;border:1px solid rgba(217,64,64,0.3);}
+.s-pend{background:rgba(230,168,23,0.15);color:#facc15;border:1px solid rgba(230,168,23,0.3);}
+.rec-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rf{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px;}
+.rf label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;display:block;margin-bottom:2px;}
+.rf p{font-size:11px;color:var(--text);font-family:'DM Mono',monospace;}
+
+/* LISTINGS */
+.listing-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.listing-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color 0.2s,transform 0.2s;}
+.listing-card:hover{border-color:var(--p);transform:translateY(-2px);}
+.listing-img{height:100px;background:linear-gradient(135deg,var(--bg3),var(--bg2));display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;}
+.l-type-tag{position:absolute;top:7px;left:7px;font-size:9px;padding:3px 7px;border-radius:10px;font-weight:600;background:rgba(109,40,217,0.8);color:#fff;}
+.l-rera{position:absolute;top:7px;right:7px;background:rgba(34,160,90,0.8);color:#fff;font-size:8px;padding:3px 6px;border-radius:8px;font-family:'DM Mono',monospace;}
+.listing-body{padding:10px;}
+.l-title{font-size:12px;font-weight:600;color:var(--text);}
+.l-loc{font-size:10px;color:var(--text2);margin:2px 0 6px;}
+.l-price{font-size:16px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;}
+.l-psf{font-size:9px;color:var(--text2);}
+.l-meta{display:flex;gap:8px;margin-top:7px;padding-top:7px;border-top:1px solid var(--border2);}
+.lm{font-size:9px;color:var(--text2);}<br>.lm span{display:block;font-size:10px;font-weight:600;color:var(--text);}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all 0.2s;}
+.chip.active,.chip:hover{background:var(--p);color:#fff;border-color:var(--p);}
+
+/* LEGAL */
+.calc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.calc-card h3{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.calc-card h3 span{font-size:10px;color:var(--text2);font-weight:400;}
+.form-field{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.form-field label{font-size:10px;color:var(--text2);letter-spacing:0.3px;}
+.form-field input,.form-field select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:12px;font-family:var(--font);outline:none;width:100%;}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.calc-result{background:linear-gradient(135deg,rgba(109,40,217,0.2),rgba(147,51,234,0.1));border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;}
+.cr-label{font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.cr-amount{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);}
+.cr-rows{margin-top:10px;font-size:11px;}
+.cr-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.07);color:var(--text2);}
+.cr-row:last-child{border:none;color:var(--text);font-weight:600;padding-top:8px;}
+.law-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.law-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;}
+.law-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2);}
+.law-item:last-child{border:none;}
+.law-code{background:rgba(109,40,217,0.2);color:var(--acc);font-size:9px;padding:3px 7px;border-radius:6px;font-family:'DM Mono',monospace;height:fit-content;white-space:nowrap;border:1px solid var(--border);}
+.law-body .lw-t{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.law-body .lw-d{font-size:10px;color:var(--text2);line-height:1.5;}
+
+/* SECURITY */
+.sec-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.sec-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;}
+.check-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:6px;transition:background 0.2s;}
+.check-item:last-child{margin-bottom:0;}
+.toggle-wrap{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle-wrap input{opacity:0;width:100%;height:100%;position:absolute;cursor:pointer;z-index:2;margin:0;}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:10px;transition:background 0.3s;border:1px solid var(--border);}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#666;border-radius:50%;transition:transform 0.3s,background 0.3s;}
+.toggle-wrap input:checked~.toggle-track{background:var(--p);}
+.toggle-wrap input:checked~.toggle-thumb{transform:translateX(16px);background:#fff;}
+.check-text{flex:1;font-size:12px;color:var(--text);}
+.check-weight{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.risk-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border2);}
+.risk-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:6px;}
+.risk-bar-bg{height:10px;background:linear-gradient(to right,var(--success),var(--warning),var(--danger));border-radius:5px;position:relative;}
+.risk-needle{position:absolute;top:-4px;width:5px;height:18px;background:#fff;border-radius:3px;transform:translateX(-50%);box-shadow:0 0 8px rgba(255,255,255,0.5);transition:left 0.6s ease;}
+.risk-score-box{background:linear-gradient(135deg,rgba(109,40,217,0.2),rgba(147,51,234,0.1));border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;text-align:center;}
+.rs-score{font-size:36px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);}
+.rs-label{font-size:12px;color:var(--text2);margin-top:4px;}
+
+/* BROKER */
+.broker-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.broker-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;}
+.comm-result{background:linear-gradient(135deg,var(--p),var(--p2));border-radius:10px;padding:14px;color:#fff;text-align:center;margin-top:10px;}
+.comm-big{font-size:26px;font-weight:700;font-family:'DM Mono',monospace;}
+.comm-small{font-size:10px;opacity:0.8;margin-top:3px;}
+.comm-brand{font-size:9px;opacity:0.6;margin-top:6px;font-style:italic;}
+.rate-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.rate-tbl th{background:rgba(109,40,217,0.2);color:var(--acc);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.5px;text-transform:uppercase;}
+.rate-tbl td{padding:7px 8px;border-bottom:1px solid var(--border2);color:var(--text2);}
+.rate-tbl tr:last-child td{border:none;}
+.rate-tbl tr:hover td{background:rgba(109,40,217,0.06);color:var(--text);}
+
+/* CLIENT SLIDER */
+.clients-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 0;overflow:hidden;position:relative;margin-bottom:14px;}
+.clients-track{display:flex;width:max-content;animation:marquee 20s linear infinite;}
+.client-item{display:flex;align-items:center;gap:8px;padding:0 28px;white-space:nowrap;}
+.client-dot{width:6px;height:6px;background:var(--p);border-radius:50%;}
+.client-name{font-size:12px;font-weight:500;color:var(--text2);}
+.clients-label{font-size:9px;color:var(--text3);text-align:center;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
+
+/* STAMP STRIP */
+.stamp-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.stamp-item{background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(147,51,234,0.08));border:1px solid var(--border);border-radius:var(--r);padding:12px;}
+.si-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.si-val{font-size:20px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace;}
+.si-note{font-size:9px;color:var(--text3);margin-top:2px;}
+
+/* DARK/LIGHT TOGGLE */
+.theme-toggle{width:36px;height:20px;position:relative;}
+.theme-toggle input{opacity:0;width:100%;height:100%;position:absolute;cursor:pointer;z-index:2;margin:0;}
+.tt-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:10px;border:1px solid var(--border);transition:background 0.3s;}
+.tt-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--acc);border-radius:50%;transition:transform 0.3s;display:flex;align-items:center;justify-content:center;font-size:8px;}
+.theme-toggle input:checked~.tt-track{background:rgba(232,184,75,0.3);}
+.theme-toggle input:checked~.tt-thumb{transform:translateX(16px);background:var(--gold);}
+
+/* SECTION HEADER */
+.s-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.s-head h2{font-size:17px;font-weight:700;color:var(--text);}
+.s-head p{font-size:10px;color:var(--text2);margin-top:2px;}
+.s-action{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:11px;cursor:pointer;font-family:var(--font);font-weight:600;}
+
+/* ABOUT */
+.about-card{background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(147,51,234,0.08));border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;text-align:center;}
+.about-logo{width:60px;height:60px;background:linear-gradient(135deg,var(--p),var(--p2));border-radius:14px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;}
+.about-card h2{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:6px;}
+.about-card p{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.about-link{display:inline-block;padding:8px 20px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;}
+</style>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-logo">
+      <div class="dlogo">C</div>
+      <div>
+        <div class="dtitle">Civitas Atlas</div>
+        <div class="drawer-sub">v1.0.0 · D.P.G CO Pune</div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-item active" onclick="navTo('overview','Real Estate Dashboard','Overview')"><span class="di-icon">📊</span><span id="d-overview">Overview</span></div>
+    <div class="drawer-item" onclick="navTo('fsi','FSI Atlas','FSI Atlas')"><span class="di-icon">🗺</span><span id="d-fsi">FSI Atlas</span></div>
+    <div class="drawer-item" onclick="navTo('landrecords','Land Records Search','Land Records')"><span class="di-icon">📋</span><span id="d-landrecords">Land Records</span></div>
+    <div class="drawer-item" onclick="navTo('listings','Buy / Sell Properties','Listings')"><span class="di-icon">🏠</span><span id="d-listings">Buy / Sell</span></div>
+    <div class="drawer-item" onclick="navTo('legal','Legal Hub','Legal Hub')"><span class="di-icon">⚖️</span><span id="d-legal">Legal Hub</span></div>
+    <div class="drawer-item" onclick="navTo('security','Security Analysis','Security')"><span class="di-icon">🔒</span><span id="d-security">Security Analysis</span></div>
+    <div class="drawer-item" onclick="navTo('broker','Broker Module','Broker')"><span class="di-icon">🤝</span><span id="d-broker">Broker</span></div>
+    <div class="drawer-item" onclick="navTo('about','About Civitas Atlas','About')"><span class="di-icon">ℹ️</span><span id="d-about">About</span></div>
+  </div>
+  <div class="drawer-foot">Developed by D.P.G CO Pune · MahaRERA Compliant</div>
+</div>
+
+<!-- HEADER -->
+<div class="main-header">
+  <div class="header-bar">
+    <div class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
+    <div class="header-center">
+      <div class="header-title" id="headerTitle">Real Estate Dashboard</div>
+      <div class="header-sub">Civitas Atlas · Maharashtra Property Intelligence</div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn active-lang" id="langBtn" onclick="toggleLang()">EN</button>
+      <div class="theme-toggle"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"><div class="tt-track"></div><div class="tt-thumb">☀</div></div>
+    </div>
+  </div>
+  <div class="tab-scroll" id="tabScroll">
+    <div class="tab-item active" onclick="navTo('overview','Real Estate Dashboard','Overview')">Overview</div>
+    <div class="tab-item" onclick="navTo('fsi','FSI Atlas','FSI Atlas')">FSI Atlas</div>
+    <div class="tab-item" onclick="navTo('landrecords','Land Records Search','Land Records')">Land Records</div>
+    <div class="tab-item" onclick="navTo('listings','Buy / Sell Properties','Listings')">Buy / Sell</div>
+    <div class="tab-item" onclick="navTo('legal','Legal Hub','Legal Hub')">Legal Hub</div>
+    <div class="tab-item" onclick="navTo('security','Security Analysis','Security')">Security</div>
+    <div class="tab-item" onclick="navTo('broker','Broker Module','Broker')">Broker</div>
+    <div class="tab-item" onclick="navTo('about','About Civitas Atlas','About')">About</div>
+  </div>
+</div>
+
+<!-- CLIENT SLIDER -->
+<div class="clients-section">
+  <div class="clients-label">Our Clients & Partners</div>
+  <div class="clients-track" id="slider">
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Adani Group</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Aditya Birla Group</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Johnson Controls</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Kolte Patil Developers</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Kohinoor Group</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Adani Group</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Aditya Birla Group</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Johnson Controls</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Kolte Patil Developers</div></div>
+    <div class="client-item"><div class="client-dot"></div><div class="client-name">Kohinoor Group</div></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- OVERVIEW -->
+<div class="section active" id="tab-overview">
+  <div class="metrics-grid">
+    <div class="metric-card fade-up"><div class="m-label">Active RERA Projects</div><div class="m-value">42,817</div><div class="m-sub">+1,203 this quarter</div><div class="m-badge">MahaRERA</div></div>
+    <div class="metric-card fade-up" style="animation-delay:0.1s"><div class="m-label">Mumbai Avg PSF</div><div class="m-value">₹18,430</div><div class="m-sub">+6.2% YoY</div><div class="m-badge">MCGM</div></div>
+    <div class="metric-card fade-up" style="animation-delay:0.15s"><div class="m-label">Pune Avg PSF</div><div class="m-value">₹7,820</div><div class="m-sub">+8.1% YoY</div><div class="m-badge">PMC</div></div>
+    <div class="metric-card fade-up" style="animation-delay:0.2s"><div class="m-label">Registrations YTD</div><div class="m-value">1.83L</div><div class="m-sub">MUM + PUNE + NGP</div><div class="m-badge">IGR</div></div>
+  </div>
+  <div class="chart-card">
+    <h3>FSI Comparison — Maharashtra Cities</h3>
+    <div style="position:relative;width:100%;height:180px;"><canvas id="fsiChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Market Price Trend (₹ per sq.ft)</h3>
+    <div style="position:relative;width:100%;height:180px;"><canvas id="priceChart"></canvas></div>
+  </div>
+  <div class="stamp-strip">
+    <div class="stamp-item"><div class="si-label">Stamp Duty — Mumbai</div><div class="si-val">6%</div><div class="si-note">5% + 1% Metro Cess</div></div>
+    <div class="stamp-item"><div class="si-label">Stamp Duty — Rest MH</div><div class="si-val">5%</div><div class="si-note">Maharashtra Stamp Act</div></div>
+    <div class="stamp-item"><div class="si-label">Registration Fee</div><div class="si-val">1%</div><div class="si-note">Max ₹30,000 residential</div></div>
+    <div class="stamp-item"><div class="si-label">Women Buyer Benefit</div><div class="si-val">−1%</div><div class="si-note">MUM: 5%, Others: 4%</div></div>
+  </div>
+  <div class="chart-card">
+    <h3>Transaction Mix — Maharashtra 2024</h3>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <div style="position:relative;width:120px;height:120px;flex-shrink:0;"><canvas id="pieChart"></canvas></div>
+      <div style="flex:1;font-size:11px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:10px;height:10px;background:#6D28D9;border-radius:2px;display:inline-block;"></span>Residential — 62%</div>
+        <div style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:10px;height:10px;background:#9333EA;border-radius:2px;display:inline-block;"></span>Commercial — 21%</div>
+        <div style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:10px;height:10px;background:#C084FC;border-radius:2px;display:inline-block;"></span>Plot/Land — 12%</div>
+        <div style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:10px;height:10px;background:#E8B84B;border-radius:2px;display:inline-block;"></span>Industrial — 5%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FSI ATLAS -->
+<div class="section" id="tab-fsi">
+  <div class="s-head"><div><h2 id="fsi-h">FSI Atlas</h2><p>DCPR 2034 · PMC DP 2041 · NMC DCR</p></div></div>
+
+  <div class="city-block animate-in">
+    <div class="city-hd"><div><h3>Mumbai</h3><div class="city-auth">MCGM · DCPR 2034</div></div><span class="city-max">MAX 5.0</span></div>
+    <div class="fsi-row"><span class="fsi-name">Island City (Base)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:27%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.33</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">Island City + TDR</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:80%;background:linear-gradient(90deg,#9333EA,#C084FC);"></div></div><span class="fsi-num">4.0</span><span class="fsi-tag t-res">TDR</span></div>
+    <div class="fsi-row"><span class="fsi-name">Suburbs (Base)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:20%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.0</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">Suburbs + TDR</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:60%;background:linear-gradient(90deg,#9333EA,#C084FC);"></div></div><span class="fsi-num">3.0</span><span class="fsi-tag t-res">TDR</span></div>
+    <div class="fsi-row"><span class="fsi-name">Transit-Oriented (TOD)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:100%;background:linear-gradient(90deg,#E8B84B,#f07830);"></div></div><span class="fsi-num">5.0</span><span class="fsi-tag t-tod">TOD</span></div>
+    <div class="fsi-row"><span class="fsi-name">SRA Slum Rehab</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:80%;background:linear-gradient(90deg,#D94040,#f07070);"></div></div><span class="fsi-num">4.0</span><span class="fsi-tag t-sra">SRA</span></div>
+    <div class="fsi-row"><span class="fsi-name">IT / ITES Zone</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:80%;background:linear-gradient(90deg,#C084FC,#9333EA);"></div></div><span class="fsi-num">4.0</span><span class="fsi-tag t-it">IT</span></div>
+    <div class="fsi-row"><span class="fsi-name">Commercial (Road >12m)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:50%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div></div><span class="fsi-num">2.5</span><span class="fsi-tag t-com">Commercial</span></div>
+  </div>
+
+  <div class="city-block animate-in" style="animation-delay:0.1s">
+    <div class="city-hd"><div><h3>Pune (PMC + PCMC)</h3><div class="city-auth">PMC DP 2041 · PCMC DCR</div></div><span class="city-max">MAX 4.0</span></div>
+    <div class="fsi-row"><span class="fsi-name">PMC Residential (General)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:50%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">2.5</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">PMC Metro TOD Zone</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:80%;background:linear-gradient(90deg,#E8B84B,#f07830);"></div></div><span class="fsi-num">4.0</span><span class="fsi-tag t-tod">TOD</span></div>
+    <div class="fsi-row"><span class="fsi-name">PCMC Residential</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:52%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">2.6</span><span class="fsi-tag t-res">PCMC</span></div>
+    <div class="fsi-row"><span class="fsi-name">Hinjewadi IT Park</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:70%;background:linear-gradient(90deg,#C084FC,#9333EA);"></div></div><span class="fsi-num">3.5</span><span class="fsi-tag t-it">IT</span></div>
+    <div class="fsi-row"><span class="fsi-name">MIDC Industrial</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:20%;background:linear-gradient(90deg,#6B7280,#9CA3AF);"></div></div><span class="fsi-num">1.0</span><span class="fsi-tag t-ind">MIDC</span></div>
+    <div class="fsi-row"><span class="fsi-name">Cluster Redevelopment</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:74%;background:linear-gradient(90deg,#D94040,#f07070);"></div></div><span class="fsi-num">3.7</span><span class="fsi-tag t-sra">Cluster</span></div>
+  </div>
+
+  <div class="city-block animate-in" style="animation-delay:0.15s">
+    <div class="city-hd"><div><h3>Nagpur</h3><div class="city-auth">NMC · NIT · NMRDA</div></div><span class="city-max">MAX 4.0</span></div>
+    <div class="fsi-row"><span class="fsi-name">Residential General</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:30%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.5</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">MIHAN SEZ</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:80%;background:linear-gradient(90deg,#C084FC,#9333EA);"></div></div><span class="fsi-num">4.0</span><span class="fsi-tag t-it">SEZ</span></div>
+    <div class="fsi-row"><span class="fsi-name">Metro TOD Zone</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:70%;background:linear-gradient(90deg,#E8B84B,#f07830);"></div></div><span class="fsi-num">3.5</span><span class="fsi-tag t-tod">TOD</span></div>
+    <div class="fsi-row"><span class="fsi-name">Commercial (NMC)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:60%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div></div><span class="fsi-num">3.0</span><span class="fsi-tag t-com">Commercial</span></div>
+  </div>
+
+  <div class="city-block animate-in" style="animation-delay:0.2s">
+    <div class="city-hd"><div><h3>Nashik / Thane / Aurangabad</h3><div class="city-auth">NMC · TMC · CSMC</div></div><span class="city-max">MULTIPLE</span></div>
+    <div class="fsi-row"><span class="fsi-name" style="color:var(--acc);font-size:9px;text-transform:uppercase;letter-spacing:0.5px;">NASHIK</span><div class="fsi-bar-bg" style="height:1px;"></div><span class="fsi-num"></span></div>
+    <div class="fsi-row"><span class="fsi-name">Residential</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:20%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.0</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">Commercial</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:30%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div></div><span class="fsi-num">1.5</span><span class="fsi-tag t-com">Commercial</span></div>
+    <div class="fsi-row"><span class="fsi-name" style="color:var(--acc);font-size:9px;text-transform:uppercase;letter-spacing:0.5px;">THANE</span><div class="fsi-bar-bg" style="height:1px;"></div><span class="fsi-num"></span></div>
+    <div class="fsi-row"><span class="fsi-name">Residential (Base)</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:30%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.5</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">Cluster Redevelopment</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:60%;background:linear-gradient(90deg,#D94040,#f07070);"></div></div><span class="fsi-num">3.0</span><span class="fsi-tag t-sra">Cluster</span></div>
+    <div class="fsi-row"><span class="fsi-name" style="color:var(--acc);font-size:9px;text-transform:uppercase;letter-spacing:0.5px;">AURANGABAD / CSN</span><div class="fsi-bar-bg" style="height:1px;"></div><span class="fsi-num"></span></div>
+    <div class="fsi-row"><span class="fsi-name">General</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:20%;background:linear-gradient(90deg,#6D28D9,#9333EA);"></div></div><span class="fsi-num">1.0</span><span class="fsi-tag t-res">Base</span></div>
+    <div class="fsi-row"><span class="fsi-name">AURIC / DMIC</span><div class="fsi-bar-bg"><div class="fsi-bar" style="width:50%;background:linear-gradient(90deg,#C084FC,#9333EA);"></div></div><span class="fsi-num">2.5</span><span class="fsi-tag t-it">AURIC</span></div>
+  </div>
+
+  <div class="rural-banner animate-in" style="animation-delay:0.25s">
+    <h3>Rural Maharashtra — FSI & Land Use</h3>
+    <div class="rural-grid">
+      <div class="rural-item"><div class="ri-l">Agricultural Zone</div><div class="ri-v">N/A</div><div class="ri-n">NA order required under Sec. 44/45 MLR Code</div></div>
+      <div class="rural-item"><div class="ri-l">Village Settlement (Gaothan)</div><div class="ri-v">0.5–1.0</div><div class="ri-n">MRTP Sec. 37 permissions apply</div></div>
+      <div class="rural-item"><div class="ri-l">MIDC Industrial</div><div class="ri-v">0.5–1.0</div><div class="ri-n">Varies by MIDC zone notification</div></div>
+      <div class="rural-item"><div class="ri-l">Tourism / Eco Zone</div><div class="ri-v">0.2–0.5</div><div class="ri-n">Eco-sensitive / forest buffer areas</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LAND RECORDS -->
+<div class="section" id="tab-landrecords">
+  <div class="search-block">
+    <h3>Search Land Records — Mahabhulekh / iGRAS</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Record Type</label>
+        <select id="recType">
+          <option>7/12 Extract (Satbara)</option>
+          <option>8A — Khata Register</option>
+          <option>Property Card (City Survey)</option>
+          <option>Mutation Entry</option>
+          <option>Encumbrance Certificate</option>
+          <option>Index II Extract</option>
+        </select>
+      </div>
+      <div class="form-group"><label>District</label>
+        <select id="distSel">
+          <option>Mumbai City</option><option>Mumbai Suburban</option>
+          <option>Pune</option><option>Nagpur</option>
+          <option>Thane</option><option>Nashik</option>
+          <option>Aurangabad</option><option>Kolhapur</option>
+          <option>Solapur</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Survey / CTS / Plot No.</label><input type="text" id="survInput" placeholder="e.g. 45/2 or CTS 1234A"/></div>
+      <div class="form-group"><label>Taluka</label><input type="text" placeholder="e.g. Haveli"/></div>
+    </div>
+    <div class="search-btn-row">
+      <button class="srch-btn" onclick="doSearch()">Search Records</button>
+      <button class="srch-btn2" onclick="doSearch()">View on Map</button>
+    </div>
+  </div>
+  <div id="rec-results">
+    <div class="record-card animate-in">
+      <div class="rec-head"><div><div class="rec-title">Survey No. 45/2 — Kharadi, Pune</div><div class="rec-id">CTS: 4521 · Taluka: Haveli · Dist: Pune</div></div><span class="status-pill s-clear">Title Clear</span></div>
+      <div class="rec-fields">
+        <div class="rf"><label>Khatedar</label><p>Rajesh Kumar Sharma</p></div>
+        <div class="rf"><label>Area (Total)</label><p>1,200 sq.m.</p></div>
+        <div class="rf"><label>Land Type</label><p>Jirayat (Non-Irrig.)</p></div>
+        <div class="rf"><label>Zone (DP)</label><p>Residential R1</p></div>
+        <div class="rf"><label>NA Status</label><p>Granted — 2018</p></div>
+        <div class="rf"><label>Encumbrance</label><p>NIL</p></div>
+      </div>
+    </div>
+    <div class="record-card animate-in" style="animation-delay:0.1s">
+      <div class="rec-head"><div><div class="rec-title">CTS No. 1892 — Bandra West, Mumbai</div><div class="rec-id">Ward: H/W · District: Mumbai Suburban</div></div><span class="status-pill s-enc">Mortgage Registered</span></div>
+      <div class="rec-fields">
+        <div class="rf"><label>Owner</label><p>Priya Mehta</p></div>
+        <div class="rf"><label>Plot Area</label><p>280 sq.m.</p></div>
+        <div class="rf"><label>Zone (MCGM)</label><p>Residential R2</p></div>
+        <div class="rf"><label>FSI Consumed</label><p>3.0 (with TDR)</p></div>
+        <div class="rf"><label>Encumbrance</label><p>SBI ₹1.2Cr Mortgage</p></div>
+        <div class="rf"><label>OC Issued</label><p>Yes — 2021</p></div>
+      </div>
+    </div>
+    <div class="record-card animate-in" style="animation-delay:0.15s">
+      <div class="rec-head"><div><div class="rec-title">Gut No. 122 — Khed Taluka, Pune</div><div class="rec-id">Village: Rajgurunagar · District: Pune</div></div><span class="status-pill s-pend">NA Pending</span></div>
+      <div class="rec-fields">
+        <div class="rf"><label>Khatedar</label><p>Dattatray Patil</p></div>
+        <div class="rf"><label>Total Area</label><p>2.5 Hectares</p></div>
+        <div class="rf"><label>Land Use</label><p>Agricultural (Jirayat)</p></div>
+        <div class="rf"><label>DP Zone</label><p>Green Zone</p></div>
+        <div class="rf"><label>Tribal (Sec.36)</label><p>No restriction</p></div>
+        <div class="rf"><label>NA Application</label><p>Filed — Under Process</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LISTINGS -->
+<div class="section" id="tab-listings">
+  <div class="s-head"><div><h2>Buy / Sell Properties</h2><p>RERA registered · Maharashtra</p></div><button class="s-action">+ Add Property</button></div>
+  <div class="chips">
+    <div class="chip active">All</div>
+    <div class="chip">Mumbai</div>
+    <div class="chip">Pune</div>
+    <div class="chip">Nagpur</div>
+    <div class="chip">Thane</div>
+    <div class="chip">Nashik</div>
+    <div class="chip">Rural</div>
+    <div class="chip">Residential</div>
+    <div class="chip">Commercial</div>
+    <div class="chip">Plot</div>
+  </div>
+  <div class="listing-grid">
+    <div class="listing-card"><div class="listing-img">🏗<span class="l-type-tag">For Sale</span><span class="l-rera">RERA ✓</span></div><div class="listing-body"><div class="l-title">3 BHK — Bandra West</div><div class="l-loc">Mumbai · H/W Ward · Sea View</div><div class="l-price">₹3.85 Cr</div><div class="l-psf">₹38,500/sq.ft · 1,000 sq.ft carpet</div><div class="l-meta"><div class="lm"><span>1,000</span>sq.ft</div><div class="lm"><span>3 BHK</span>Type</div><div class="lm"><span>2027</span>Possession</div></div></div></div>
+    <div class="listing-card"><div class="listing-img" style="background:linear-gradient(135deg,#1e3a6e,#2d5a9e);">🏢<span class="l-type-tag" style="background:rgba(26,158,143,0.8);">For Sale</span><span class="l-rera">RERA ✓</span></div><div class="listing-body"><div class="l-title">2 BHK — Kharadi, Pune</div><div class="l-loc">Pune · PMC · Near EON IT Park</div><div class="l-price">₹82 L</div><div class="l-psf">₹7,800/sq.ft · 1,050 sq.ft carpet</div><div class="l-meta"><div class="lm"><span>1,050</span>sq.ft</div><div class="lm"><span>2 BHK</span>Type</div><div class="lm"><span>2026</span>Possession</div></div></div></div>
+    <div class="listing-card"><div class="listing-img" style="background:linear-gradient(135deg,#2d3a1e,#4a6e30);">🌿<span class="l-type-tag" style="background:rgba(34,160,90,0.8);">Plot</span></div><div class="listing-body"><div class="l-title">NA Plot — Lonavala</div><div class="l-loc">Pune Dist. · Maval Taluka</div><div class="l-price">₹45 L</div><div class="l-psf">₹3,750/sq.ft · 1,200 sq.ft</div><div class="l-meta"><div class="lm"><span>1,200</span>sq.ft</div><div class="lm"><span>NA</span>Status</div><div class="lm"><span>FSI 1.0</span>Permissible</div></div></div></div>
+    <div class="listing-card"><div class="listing-img" style="background:linear-gradient(135deg,#3a1e2d,#6e2d4a);">🏪<span class="l-type-tag" style="background:rgba(147,51,234,0.8);">Commercial</span><span class="l-rera">RERA ✓</span></div><div class="listing-body"><div class="l-title">Shop — Nagpur MIHAN</div><div class="l-loc">Nagpur · MIHAN SEZ</div><div class="l-price">₹1.2 Cr</div><div class="l-psf">₹12,000/sq.ft · 1,000 sq.ft</div><div class="l-meta"><div class="lm"><span>1,000</span>sq.ft</div><div class="lm"><span>SEZ</span>Zone</div><div class="lm"><span>Ready</span>Possession</div></div></div></div>
+    <div class="listing-card"><div class="listing-img" style="background:linear-gradient(135deg,#1e2d3a,#2d4a6e);">🏠<span class="l-type-tag" style="background:rgba(232,184,75,0.8);">For Rent</span><span class="l-rera">RERA ✓</span></div><div class="listing-body"><div class="l-title">2 BHK — Thane West</div><div class="l-loc">Thane · TMC · Wagle Estate</div><div class="l-price">₹28k/mo</div><div class="l-psf">₹26/sq.ft/mo · 1,080 sq.ft</div><div class="l-meta"><div class="lm"><span>1,080</span>sq.ft</div><div class="lm"><span>2 BHK</span>Type</div><div class="lm"><span>Available</span>Now</div></div></div></div>
+    <div class="listing-card"><div class="listing-img" style="background:linear-gradient(135deg,#2d1e3a,#4a2d6e);">🏘<span class="l-type-tag" style="background:rgba(109,40,217,0.8);">Row House</span><span class="l-rera">RERA ✓</span></div><div class="listing-body"><div class="l-title">Row House — Nashik</div><div class="l-loc">Nashik · NMC · Gangapur Rd</div><div class="l-price">₹1.05 Cr</div><div class="l-psf">₹4,200/sq.ft · 2,500 sq.ft plot</div><div class="l-meta"><div class="lm"><span>2,500</span>sq.ft</div><div class="lm"><span>3 BHK</span>Type</div><div class="lm"><span>2025</span>Possession</div></div></div></div>
+  </div>
+</div>
+
+<!-- LEGAL HUB -->
+<div class="section" id="tab-legal">
+  <div class="calc-card">
+    <h3>Stamp Duty & Registration Calculator <span>Maharashtra Stamp Act 1958</span></h3>
+    <div class="form-row2">
+      <div class="form-field"><label>Transaction Type</label><select id="txType" onchange="calcStamp()"><option value="sale">Sale Agreement</option><option value="gift">Gift Deed</option><option value="lease">Lease/Rent Agmt.</option><option value="mortgage">Mortgage Deed</option><option value="partition">Partition Deed</option></select></div>
+      <div class="form-field"><label>Location</label><select id="txLoc" onchange="calcStamp()"><option value="mumbai">Mumbai (MCGM)</option><option value="pune">Pune / Nagpur / Other</option><option value="rural">Rural / Other</option></select></div>
+    </div>
+    <div class="form-row2">
+      <div class="form-field"><label>Agreement Value (₹)</label><input type="number" id="propVal" value="5000000" oninput="calcStamp()"/></div>
+      <div class="form-field"><label>Ready Reckoner (₹)</label><input type="number" id="rrVal" value="4800000" oninput="calcStamp()"/></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer;margin-bottom:8px;"><input type="checkbox" id="womanBuyer" onchange="calcStamp()" style="accent-color:var(--p);"> Woman as primary buyer (1% concession)</label>
+    <div class="calc-result" id="stampOut">
+      <div class="cr-label">Total Government Outgo</div>
+      <div class="cr-amount" id="totalOut">₹—</div>
+      <div class="cr-rows" id="stampRows"></div>
+    </div>
+  </div>
+  <div class="law-card">
+    <h3>Key Maharashtra Property Laws</h3>
+    <div class="law-item"><span class="law-code">MahaRERA</span><div class="law-body"><div class="lw-t">Real Estate (Regulation & Development) Act, 2016</div><div class="lw-d">Mandatory registration for projects &gt;500 sq.m. or 8+ units. 70% escrow. Delivery timelines legally enforceable.</div></div></div>
+    <div class="law-item"><span class="law-code">MOFA 1963</span><div class="law-body"><div class="lw-t">Maharashtra Ownership Flats Act</div><div class="lw-d">Promoter obligations, society formation within 4 months, conveyance of land mandatory.</div></div></div>
+    <div class="law-item"><span class="law-code">MRTP 1966</span><div class="law-body"><div class="lw-t">Maharashtra Regional & Town Planning Act</div><div class="lw-d">FSI zones, DP/TP schemes, NA permissions (Sec. 44/45), Change of Land Use (CLU).</div></div></div>
+    <div class="law-item"><span class="law-code">MLR Code</span><div class="law-body"><div class="lw-t">Maharashtra Land Revenue Code, 1966</div><div class="lw-d">7/12 records, mutations, NA conversion, tribal land restrictions (Sec. 36), agricultural ceiling.</div></div></div>
+    <div class="law-item"><span class="law-code">MRC Act</span><div class="law-body"><div class="lw-t">Maharashtra Rent Control Act, 1999</div><div class="lw-d">Urban tenant protections, standard rent, eviction grounds, pagdi/kholi system in Mumbai.</div></div></div>
+    <div class="law-item"><span class="law-code">MSA 1958</span><div class="law-body"><div class="lw-t">Maharashtra Stamp Act, 1958</div><div class="lw-d">Stamp duty on all instruments. Higher of agreement value or Ready Reckoner (ASR) applies.</div></div></div>
+  </div>
+</div>
+
+<!-- SECURITY -->
+<div class="section" id="tab-security">
+  <div class="sec-card">
+    <h3>Title Verification Checklist — Toggle to verify</h3>
+    <div class="check-list" id="checkList"></div>
+    <div class="risk-section">
+      <div class="risk-lbl"><span>Low Risk</span><span>Medium</span><span>High Risk</span></div>
+      <div class="risk-bar-bg"><div class="risk-needle" id="riskNeedle" style="left:50%"></div></div>
+    </div>
+    <div class="risk-score-box">
+      <div class="rs-score" id="riskScore">50</div>
+      <div class="rs-label" id="riskLabel">Security Score — Toggle items above</div>
+    </div>
+  </div>
+  <div class="sec-card">
+    <h3>Documents Required for Due Diligence</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">7/12 Extract / Property Card</span><span style="background:rgba(34,160,90,0.15);color:#4ade80;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(34,160,90,0.3);">Obtained</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">Index II (Last 30 Years)</span><span style="background:rgba(34,160,90,0.15);color:#4ade80;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(34,160,90,0.3);">Obtained</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">Society NOC / Share Certificate</span><span style="background:rgba(230,168,23,0.15);color:#facc15;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(230,168,23,0.3);">Pending</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">IOD / Building Plan Sanction</span><span style="background:rgba(34,160,90,0.15);color:#4ade80;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(34,160,90,0.3);">Available</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">Occupancy / Completion Certificate</span><span style="background:rgba(34,160,90,0.15);color:#4ade80;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(34,160,90,0.3);">Available</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;"><span style="color:var(--text2);">Bank Loan NOC (if any)</span><span style="background:rgba(217,64,64,0.15);color:#f87171;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(217,64,64,0.3);">Required</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BROKER -->
+<div class="section" id="tab-broker">
+  <div class="broker-card">
+    <h3>Commission Calculator — D.P.G Investments CO.</h3>
+    <div class="form-field"><label>Transaction Value (₹)</label><input type="number" id="brkVal" value="8500000" oninput="calcBrokerage()"/></div>
+    <div class="form-row2">
+      <div class="form-field"><label>Commission Rate</label>
+        <select id="brkRate" onchange="calcBrokerage()">
+          <option value="1">1% — Standard Residential</option>
+          <option value="2" selected>2% — Premium Residential</option>
+          <option value="2.5">2.5% — Luxury (₹5Cr+)</option>
+          <option value="1.5">1.5% — Commercial (Buyer)</option>
+          <option value="1">1% — Commercial (Seller)</option>
+        </select>
+      </div>
+      <div class="form-field"><label>Charged To</label>
+        <select id="brkParty" onchange="calcBrokerage()">
+          <option value="2">Both Buyer + Seller</option>
+          <option value="1">Single Party Only</option>
+        </select>
+      </div>
+    </div>
+    <div class="comm-result">
+      <div class="comm-big" id="commAmt">₹0</div>
+      <div class="comm-small" id="commNote">Total brokerage + 18% GST</div>
+      <div class="comm-brand">Brokerage Calculator — D.P.G INVESTMENTS CO.</div>
+    </div>
+  </div>
+  <div class="broker-card">
+    <h3>Standard Rate Card — Maharashtra</h3>
+    <table class="rate-tbl">
+      <thead><tr><th>Segment</th><th>Rate</th><th>Charged To</th></tr></thead>
+      <tbody>
+        <tr><td>Residential ≤₹50L</td><td>1–1.5%</td><td>Seller</td></tr>
+        <tr><td>Residential ₹50L–₹2Cr</td><td>1.5–2%</td><td>Both / Seller</td></tr>
+        <tr><td>Luxury ₹2Cr–₹5Cr</td><td>2%</td><td>Both</td></tr>
+        <tr><td>Ultra-Luxury ₹5Cr+</td><td>1–2.5% neg.</td><td>Both</td></tr>
+        <tr><td>Commercial Sale</td><td>1–2%</td><td>Each Party</td></tr>
+        <tr><td>Commercial Lease</td><td>1 Month Rent</td><td>Landlord</td></tr>
+        <tr><td>Residential Rental</td><td>1 Month Rent</td><td>Landlord</td></tr>
+        <tr><td>Land / Plot</td><td>1.5–2%</td><td>Seller</td></tr>
+        <tr><td>GST on Brokerage</td><td>18%</td><td>Client</td></tr>
+        <tr><td>TDS (Sec. 194H IT Act)</td><td>5% if &gt;₹15,000</td><td>Client deducts</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="broker-card">
+    <h3>RERA Broker Compliance — Maharashtra</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="padding:10px;background:rgba(34,160,90,0.08);border-radius:8px;border-left:3px solid var(--success);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">MahaRERA Agent Registration (Sec. 9)</div><div style="font-size:10px;color:var(--text2);">Mandatory. Fine up to ₹10,000/day for non-registration. Renewal every 5 years.</div></div>
+      <div style="padding:10px;background:rgba(230,168,23,0.08);border-radius:8px;border-left:3px solid var(--warning);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Written Mandate from Client</div><div style="font-size:10px;color:var(--text2);">Registered brokerage agreement protects fee recovery in court.</div></div>
+      <div style="padding:10px;background:rgba(109,40,217,0.1);border-radius:8px;border-left:3px solid var(--p);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Verify RERA Project Before Dealing</div><div style="font-size:10px;color:var(--text2);">Broker liable if selling unregistered project. Check maharera.mahaonline.gov.in</div></div>
+      <div style="padding:10px;background:rgba(217,64,64,0.08);border-radius:8px;border-left:3px solid var(--danger);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Dual Agency Disclosure</div><div style="font-size:10px;color:var(--text2);">Must disclose interest in property. Dual agency requires written consent from both parties.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section" id="tab-about">
+  <div class="about-card">
+    <div class="about-logo">C</div>
+    <h2>Civitas Atlas</h2>
+    <p style="color:var(--acc);font-size:13px;font-weight:500;margin-bottom:8px;">Maharashtra Property Intelligence Platform</p>
+    <p>A smart platform for land records, real estate analytics, FSI mapping, and legal verification across Maharashtra. Covering metro cities, tier-2 cities, and rural regions with full MahaRERA compliance.</p>
+    <a class="about-link" href="https://omwdev.netlify.app/" target="_blank">View Portfolio →</a>
+  </div>
+  <div class="sec-card">
+    <h3>Platform Capabilities</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
+      <div style="padding:10px;background:rgba(109,40,217,0.1);border-radius:8px;text-align:center;"><div style="font-size:18px;margin-bottom:4px;">🗺</div><div style="color:var(--text);font-weight:600;">FSI Atlas</div><div style="color:var(--text2);">City & zone-wise FSI data</div></div>
+      <div style="padding:10px;background:rgba(109,40,217,0.1);border-radius:8px;text-align:center;"><div style="font-size:18px;margin-bottom:4px;">📋</div><div style="color:var(--text);font-weight:600;">Land Records</div><div style="color:var(--text2);">Mahabhulekh / iGRAS linked</div></div>
+      <div style="padding:10px;background:rgba(109,40,217,0.1);border-radius:8px;text-align:center;"><div style="font-size:18px;margin-bottom:4px;">⚖️</div><div style="color:var(--text);font-weight:600;">Legal Hub</div><div style="color:var(--text2);">Indian property law reference</div></div>
+      <div style="padding:10px;background:rgba(109,40,217,0.1);border-radius:8px;text-align:center;"><div style="font-size:18px;margin-bottom:4px;">🔒</div><div style="color:var(--text);font-weight:600;">Security Analysis</div><div style="color:var(--text2);">Title, EC & risk scoring</div></div>
+    </div>
+  </div>
+  <div class="sec-card">
+    <h3>Future Roadmap</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+      <div style="display:flex;align-items:center;gap:8px;color:var(--text2);"><span style="color:var(--p);font-size:14px;">✦</span>AI Property Advisor — Smart recommendations</div>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--text2);"><span style="color:var(--p);font-size:14px;">✦</span>Fraud Detection Engine — ML-based title fraud</div>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--text2);"><span style="color:var(--p);font-size:14px;">✦</span>Voice Search — Marathi & Hindi support</div>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--text2);"><span style="color:var(--p);font-size:14px;">✦</span>Map Integration — GIS FSI overlay on satellite</div>
+    </div>
+  </div>
+  <div style="text-align:center;padding:12px;font-size:10px;color:var(--text3);">Developed by D.P.G CO Pune · Civitas Atlas v1.0.0 · MahaRERA Compliant</div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var lang='en';
+var isDark=true;
+var checks=[
+  {label:{en:'30-Year Title Chain Verified',mr:'३० वर्षांची मालमत्ता साखळी'},weight:20,checked:true},
+  {label:{en:'Encumbrance Certificate — Clear',mr:'भार प्रमाणपत्र — स्वच्छ'},weight:20,checked:true},
+  {label:{en:'NA Permission Obtained (Sec. 44 MLR)',mr:'एनए परवानगी मिळाली'},weight:15,checked:true},
+  {label:{en:'Property Tax — Fully Paid',mr:'मालमत्ता कर — भरलेला'},weight:10,checked:false},
+  {label:{en:'RERA Registration Verified',mr:'RERA नोंदणी सत्यापित'},weight:15,checked:true},
+  {label:{en:'OC / CC Available',mr:'व्याप प्रमाणपत्र उपलब्ध'},weight:10,checked:true},
+  {label:{en:'No Litigation on Record',mr:'कोणतीही खटला नाही'},weight:10,checked:false}
+];
+
+function navTo(id,title,drawerLabel){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.drawer-item').forEach(d=>d.classList.remove('active'));
+  var sec=document.getElementById('tab-'+id);
+  if(sec){sec.classList.add('active');sec.style.animation='none';sec.offsetHeight;sec.style.animation='';}
+  document.getElementById('headerTitle').textContent=title;
+  var tabs=document.querySelectorAll('.tab-item');
+  var ids=['overview','fsi','landrecords','listings','legal','security','broker','about'];
+  var idx=ids.indexOf(id);
+  if(idx>=0&&tabs[idx])tabs[idx].classList.add('active');
+  var dItems=document.querySelectorAll('.drawer-item');
+  if(idx>=0&&dItems[idx])dItems[idx].classList.add('active');
+  closeDrawer();
+  if(id==='security')renderChecks();
+  if(id==='overview'&&!window._ci){initCharts();window._ci=true;}
+}
+
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('open');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+function toggleLang(){
+  lang=lang==='en'?'mr':'en';
+  document.getElementById('langBtn').textContent=lang==='en'?'EN':'मर';
+  document.getElementById('langBtn').classList.toggle('active-lang');
+  renderChecks();
+}
+
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('light-mode',!isDark);
+}
+
+function renderChecks(){
+  var html='';
+  checks.forEach(function(c,i){
+    html+='<div class="check-item"><div class="toggle-wrap"><input type="checkbox"'+(c.checked?' checked':'')+'onchange="toggleCheck('+i+',this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></div><div class="check-text">'+c.label[lang]+'</div><div class="check-weight">'+c.weight+'pt</div></div>';
+  });
+  document.getElementById('checkList').innerHTML=html;
+  updateRisk();
+}
+
+function toggleCheck(i,v){checks[i].checked=v;updateRisk();}
+
+function updateRisk(){
+  var total=checks.reduce(function(a,c){return a+(c.checked?c.weight:0);},0);
+  var pct=Math.min(100,total);
+  var needle=100-pct;
+  document.getElementById('riskNeedle').style.left=needle+'%';
+  document.getElementById('riskScore').textContent=pct;
+  var lbl=pct>=80?'LOW RISK — Strong Title':pct>=50?'MODERATE RISK — Verify Pending Items':'HIGH RISK — Major Issues Found';
+  var col=pct>=80?'#4ade80':pct>=50?'#facc15':'#f87171';
+  document.getElementById('riskLabel').textContent=lbl;
+  document.getElementById('riskScore').style.color=col;
+}
+
+function calcStamp(){
+  var ag=parseInt(document.getElementById('propVal').value)||0;
+  var rr=parseInt(document.getElementById('rrVal').value)||0;
+  var base=Math.max(ag,rr);
+  var loc=document.getElementById('txLoc').value;
+  var tx=document.getElementById('txType').value;
+  var woman=document.getElementById('womanBuyer').checked;
+  var rate=0.05,metro=0,label='Stamp Duty';
+  if(tx==='sale'){
+    if(loc==='mumbai'){rate=woman?0.04:0.05;metro=0.01;}
+    else{rate=woman?0.04:0.05;}
+  }else if(tx==='gift'){rate=0.02;}
+  else if(tx==='lease'){rate=0.005;label='Stamp Duty (Lease)';}
+  else if(tx==='mortgage'){rate=0.003;label='Stamp Duty (Mortgage)';}
+  else if(tx==='partition'){rate=0.02;label='Stamp Duty (Partition)';}
+  var stamp=Math.round(base*rate);
+  var metroAmt=Math.round(base*metro);
+  var regFee=tx==='sale'?Math.min(Math.round(ag*0.01),30000):Math.min(Math.round(ag*0.01),30000);
+  var total=stamp+metroAmt+regFee;
+  document.getElementById('totalOut').textContent='₹'+total.toLocaleString('en-IN');
+  document.getElementById('stampRows').innerHTML=
+    '<div class="cr-row"><span>'+label+' ('+((rate)*100).toFixed(1)+'%)</span><span>₹'+stamp.toLocaleString('en-IN')+'</span></div>'+
+    (metroAmt?'<div class="cr-row"><span>Metro Cess (1%)</span><span>₹'+metroAmt.toLocaleString('en-IN')+'</span></div>':'')+
+    '<div class="cr-row"><span>Registration Fee</span><span>₹'+regFee.toLocaleString('en-IN')+'</span></div>'+
+    '<div class="cr-row"><span>TOTAL OUTGO</span><span>₹'+total.toLocaleString('en-IN')+'</span></div>';
+}
+
+function calcBrokerage(){
+  var val=parseInt(document.getElementById('brkVal').value)||0;
+  var rate=parseFloat(document.getElementById('brkRate').value)/100;
+  var mult=parseInt(document.getElementById('brkParty').value);
+  var brk=Math.round(val*rate*mult);
+  var gst=Math.round(brk*0.18);
+  var total=brk+gst;
+  document.getElementById('commAmt').textContent='₹'+total.toLocaleString('en-IN');
+  document.getElementById('commNote').textContent='Brokerage ₹'+brk.toLocaleString('en-IN')+' + GST 18% ₹'+gst.toLocaleString('en-IN');
+}
+
+function doSearch(){
+  var num=document.getElementById('survInput').value;
+  if(!num){return;}
+  document.getElementById('rec-results').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2);font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);">Searching records for "'+num+'"...<br><span style="color:var(--acc);font-size:10px;">Connected to Mahabhulekh · iGRAS · DLR Portal</span></div>';
+}
+
+function initCharts(){
+  var p1='rgba(109,40,217,0.8)',p2='rgba(147,51,234,0.5)',p3='rgba(192,132,252,0.7)',g='rgba(232,184,75,0.8)';
+  var tc='rgba(255,255,255,0.6)',gc='rgba(255,255,255,0.05)';
+
+  new Chart(document.getElementById('fsiChart'),{
+    type:'bar',
+    data:{
+      labels:['Mumbai\nIsland','Mumbai\nTOD','Pune\nGeneral','Pune\nTOD','Nagpur','Thane','Nashik','Aurangabad'],
+      datasets:[
+        {label:'Base FSI',data:[1.33,1.0,2.5,2.0,1.5,1.5,1.0,1.0],backgroundColor:p1,borderRadius:4},
+        {label:'Max Permissible',data:[4.0,5.0,4.0,4.0,4.0,3.0,2.0,2.5],backgroundColor:p2,borderRadius:4}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{color:tc,font:{size:9}},grid:{display:false}},y:{ticks:{color:tc},grid:{color:gc}}}}
+  });
+
+  new Chart(document.getElementById('priceChart'),{
+    type:'line',
+    data:{
+      labels:['2020','2021','2022','2023','2024','2025'],
+      datasets:[
+        {label:'Mumbai',data:[15200,15800,16400,17200,17900,18430],borderColor:'#9333EA',tension:0.4,fill:false,pointRadius:3,pointBackgroundColor:'#9333EA'},
+        {label:'Pune',data:[5200,5600,6100,6800,7300,7820],borderColor:'#C084FC',tension:0.4,fill:false,pointRadius:3,pointBackgroundColor:'#C084FC'},
+        {label:'Nagpur',data:[3800,4000,4300,4700,5000,5320],borderColor:'#E8B84B',tension:0.4,fill:false,pointRadius:3,pointBackgroundColor:'#E8B84B'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{color:tc},grid:{display:false}},y:{ticks:{color:tc,callback:function(v){return'₹'+v.toLocaleString();}},grid:{color:gc}}}}
+  });
+
+  new Chart(document.getElementById('pieChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Residential','Commercial','Plot/Land','Industrial'],
+      datasets:[{data:[62,21,12,5],backgroundColor:['#6D28D9','#9333EA','#C084FC','#E8B84B'],borderWidth:0}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+  });
+}
+
+document.querySelectorAll('.chip').forEach(function(c){
+  c.addEventListener('click',function(){
+    var siblings=this.parentElement.querySelectorAll('.chip');
+    siblings.forEach(function(s){s.classList.remove('active');});
+    this.classList.add('active');
+  });
+});
+
+window.addEventListener('load',function(){
+  renderChecks();
+  calcStamp();
+  calcBrokerage();
+  initCharts();
+  window._ci=true;
+});
+</script>
